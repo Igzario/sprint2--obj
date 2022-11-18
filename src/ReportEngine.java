@@ -49,20 +49,21 @@ public class ReportEngine {
             String maxDohodName = "";
             int maxRashod = 0;
             String maxRashodName = "";
+
             for (StrokaMonth j : monthReport.MonthlyReport.get(i).nameArrayMonth) {
-                if (j.is_expense.equals("FALSE")) {
+                if (j.is_expense) {
                     if (j.value > maxDohod) {
                         maxDohod = j.value;
                         maxDohodName = j.item_name;
                     }
-                }
-                if (j.is_expense.equals("TRUE")) {
+                } else {
                     if (j.value > maxRashod) {
                         maxRashod = j.value;
                         maxRashodName = j.item_name;
                     }
                 }
             }
+            System.out.println(monthToString(i));
             if (maxDohod != 0) {
                 System.out.println("         Максимальный доход:" + "\n" + "    " + maxDohodName + " - " + maxDohod + "р.");
             }
@@ -99,35 +100,50 @@ public class ReportEngine {
 
         System.out.println("Годовой отчет за: " + yearNumber + " год");
         int month = 1;
-        int monthUpMoney = 0;
-        int monthDownMoney = 0;
-        int upMoney = 0;
-        int downMoney = 0;
-        int monthHowMuch = 0;
-            for (Year year : yearlyReport.yearReport.values()) {
-                int dohod = 0;
-                int rashod = 0;
-                int schet = 0;
-                for (StrokaYear stroka : year.nameArrayYear) {
+        ArrayList<Integer> dohodi = new ArrayList<>();
+        ArrayList<Integer> rashodi = new ArrayList<>();
+        int allDohod = 0;
+        int allRashod = 0;
+        int middleDohod = 0;
+        int middleRashod = 0;
+        for (Year year : yearlyReport.yearReport.values()) {
+            int dohod = 0;
+            int rashod = 0;
+            int schet = 0;
+            int cash = 0;
+            for (StrokaYear stroka : year.nameArrayYear) {
 
-                        if (stroka.is_expense) {
-                            rashod = stroka.amount;
-                            schet++;
-                        } else {
-                            dohod = stroka.amount;
-                            schet++;
-                        }
-                        if (schet % 2 == 0){
-                            System.out.println("Доход за: " + month + "'й месяц - " + dohod);
-                            System.out.println("Расход за: " + month + "'й месяц - " + rashod);
-                            month = Integer.parseInt(stroka.month)+1;
-                            schet=0;
-                        }
-
-                    }
+                if (stroka.is_expense) {
+                    rashod = stroka.amount;
+                    schet++;
+                } else {
+                    dohod = stroka.amount;
+                    schet++;
+                }
+                if (schet % 2 == 0) {
+                    dohodi.add(dohod);
+                    rashodi.add(rashod);
+                    cash = dohod - rashod;
+                    System.out.println(monthToString(Integer.parseInt(stroka.month)) + ":");
+                    System.out.println("Доход - " + dohod);
+                    System.out.println("Расход - " + rashod);
+                    System.out.println("Доход - " + cash + "\n");
+                    month = Integer.parseInt(stroka.month) + 1;
+                    schet = 0;
                 }
 
-
+            }
+        }
+        for (int i = 0; i < dohodi.size(); i++) {
+            allDohod = allDohod + dohodi.get(i);
+        }
+        middleDohod = allDohod / dohodi.size();
+        System.out.println("Средний доход за " + dohodi.size() + " месяца(ев): " + middleDohod);
+        for (int i = 0; i < rashodi.size(); i++) {
+            allRashod = allRashod + rashodi.get(i);
+        }
+        middleRashod = allRashod / rashodi.size();
+        System.out.println("Средний доход за " + rashodi.size() + " месяца(ев): " + middleRashod + "\n");
 
 
 
@@ -161,6 +177,37 @@ public class ReportEngine {
         }
         System.out.println("\nСредний расход за " + monthHowMuch + " месяц(ев): " + (downMoney / monthHowMuch));
         System.out.println("\nСредний доход за " + monthHowMuch + " месяц(ев): " + (upMoney / monthHowMuch)+ "\n");*/
-        }
-
     }
+
+    public String monthToString(Integer month) {
+        switch (month) {
+            case 1:
+                return "Январь";
+            case 2:
+                return "Февраль";
+            case 3:
+                return "Март";
+            case 4:
+                return "Апрель";
+            case 5:
+                return "Май";
+            case 6:
+                return "Июнь";
+            case 7:
+                return "Июль";
+            case 8:
+                return "Август";
+            case 9:
+                return "Сентябрь";
+            case 10:
+                return "Октябрь";
+            case 11:
+                return "Ноябрь";
+            case 12:
+                return "Декабрь";
+        }
+        return "error";
+    }
+
+
+}
